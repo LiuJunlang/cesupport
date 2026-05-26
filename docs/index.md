@@ -5,7 +5,7 @@ title: CE Support
 hero:
   name: "CE Support"
   text: "BLE 芯片客户技术支持中心"
-  tagline: FAE 参考文档 · 常见问题 · 调试指南 · 固件发布
+  tagline: FAE 参考文档 · 常见问题 · 调试指南 · 固件发布 | 2026-05-26 上线
   actions:
     - theme: brand
       text: 常见问题 FAQ
