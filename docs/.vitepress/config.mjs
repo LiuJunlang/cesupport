@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/cesupport/',
   lang: 'zh-CN',
   title: 'CE Support',
   description: 'BLE 芯片客户技术支持中心 - FAE 参考文档',
