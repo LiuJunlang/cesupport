@@ -4,7 +4,7 @@
 
 ## 指南列表
 
-- [HCI 日志抓取分析](./hci-log) — btsnoop 抓包分析方法
+- [HCI 日志抓取以及分析](./hci-log) — btsnoop 抓包分析方法
 - [断连排查流程](./disconnect) — 系统性排查断开原因
 
 ---

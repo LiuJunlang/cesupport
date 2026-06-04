@@ -34,7 +34,7 @@ export default defineConfig({
           text: '调试指南',
           items: [
             { text: '概览', link: '/guides/' },
-            { text: 'HCI 日志分析', link: '/guides/hci-log' },
+            { text: 'HCI 日志抓取以及分析', link: '/guides/hci-log' },
             { text: '断连排查流程', link: '/guides/disconnect' }
           ]
         }
