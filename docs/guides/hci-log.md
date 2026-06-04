@@ -1,12 +1,18 @@
-# HCI 日志分析指南
+# HCI 日志抓取以及简单分析
 
 ## 抓取 btsnoop 日志
 
 ### Android 设备
 
-1. 开启「开发者选项」→ 启用「启用蓝牙 HCI 信息收集日志」
-2. 复现问题后，日志保存在 `/data/misc/bluetooth/logs/btsnoop_hci.log`
-3. 使用 `adb pull` 导出
+1. 开启「开发者选项」→ 启用「启用蓝牙 HCI 信息收集日志」 这个是系统的hci 日志
+2. setprop persist.bluetooth.btsnoopenable true 
+3. setprop persist.bluetooth.btsnooppath /data/misc/bluedroid/bt_snoop.cfa
+4. setprop persist.vendor.btsnoop.enable true 
+5. setprop persist.vendor.btsnoopsavelog true 
+6. 重启设备。上面的配置设置一次之后永久生效。
+7. 复现问题后，adb pull 出 /data/misc/bluedroid/ 这个目录即可
+8. 每次复现新的问题，建议重启一下设备。
+
 
 ### 其他平台
 
