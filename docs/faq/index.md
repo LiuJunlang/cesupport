@@ -7,6 +7,7 @@
 - [蓝牙连接问题](./connection) — 配对失败、回连异常、距离衰减等
 - [A2DP 音频问题](./audio) — 卡顿、无声、编解码器不匹配等
 - [FEATURE支持情况](./feature) — feature支持情况
+- [INI 配置](./ini-config) — INI 配置项说明与示例
 
 ---
 
