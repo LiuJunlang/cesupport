@@ -8,6 +8,7 @@
 - [A2DP 音频问题](./audio) — 卡顿、无声、编解码器不匹配等
 - [FEATURE支持情况](./feature) — feature支持情况
 - [INI 配置](./ini-config) — INI 配置项说明与示例
+- [注意事项](./cautions) — 常见问题与重要提醒
 
 ---
 

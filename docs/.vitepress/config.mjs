@@ -27,7 +27,8 @@ export default defineConfig({
             { text: '蓝牙连接问题', link: '/faq/connection' },
             { text: 'A2DP 音频问题', link: '/faq/audio' },
             { text: 'Feature 支持情况', link: '/faq/feature' },
-            { text: 'INI 配置', link: '/faq/ini-config' }
+            { text: 'INI 配置', link: '/faq/ini-config' },
+            { text: '注意事项', link: '/faq/cautions' }
           ]
         }
       ],
