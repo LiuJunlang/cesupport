@@ -6,6 +6,7 @@
 
 - [HCI 日志抓取以及分析](./hci-log) — btsnoop 抓包分析方法
 - [断连排查流程](./disconnect) — 系统性排查断开原因
+- [UART RX 溢出与 RTS/CTS 排查](./uart-rts-cts) — 硬件流控与 UART 调试
 
 ---
 

@@ -38,7 +38,8 @@ export default defineConfig({
           items: [
             { text: '概览', link: '/guides/' },
             { text: 'HCI 日志抓取以及分析', link: '/guides/hci-log' },
-            { text: '断连排查流程', link: '/guides/disconnect' }
+            { text: '断连排查流程', link: '/guides/disconnect' },
+            { text: 'UART RX 溢出与 RTS/CTS 排查', link: '/guides/uart-rts-cts' }
           ]
         }
       ],
