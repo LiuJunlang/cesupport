@@ -37,21 +37,35 @@ coex_ant_mode=2
 
 ---
 
-## Q2：<待填充>
+## Q2：`ps_mode` 低功耗模式如何配置？
 
-<!--
+`ps_mode` 是一个 **bitmask 配置项**，每个 bit 控制一个电源域的低功耗模式开关。值为各 bit 的十进制和。
 
-**排查方向**：
+| Bit | 值 | 控制项 | 说明 |
+|-----|:--:|--------|------|
+| bit0 | 1 | WiFi IP Sleep | WiFi IP 核进入 sleep 模式 |
+| bit1 | 2 | WSYS Deep Sleep | 无线子系统进入深度睡眠 |
+| bit2 | 4 | BSYS Deep Sleep | 蓝牙子系统进入深度睡眠 |
+| bit3 | 8 | DTOP Deep Sleep | 数字 Top 域进入深度睡眠 |
 
-1. 
-2. 
-3. 
+### 配置示例
 
-**参考信息**：
+```ini
+# 全部启用（1+2+4+8=15）
+ps_mode=15
+```
 
-> 
+```ini
+# 仅启用 WSYS + BSYS + DTOP 深度睡眠，WiFi IP 保持正常（2+4+8=14）
+ps_mode=14
+```
 
--->
+```ini
+# 全部关闭
+ps_mode=0
+```
+
+> **注意**：`ps_mode` 的实际生效取决于对应子系统的固件是否支持该级别的睡眠模式。配置为 15（`0b1111`）即请求全部电源域进入低功耗。
 
 ---
 
@@ -74,8 +88,7 @@ coex_ant_mode=2
 | 配置项 | 适用项目 | 说明 | 可选值 |
 |--------|----------|------|--------|
 | `rcu_pattern` | — | 配置唤醒 | bit 0: AB 格式 / bit 1: 广电格式 |
-|        |      |        |          |
-|        |      |        |          |
+| `ps_mode` | — | 低功耗模式 (bitmask) | bit 0: WiFi IP Sleep / bit 1: WSYS Deep Sleep / bit 2: BSYS Deep Sleep / bit 3: DTOP Deep Sleep |
 
 ---
 
