@@ -9,6 +9,7 @@
 - [FEATURE支持情况](./feature) — feature支持情况
 - [INI 配置](./ini-config) — INI 配置项说明与示例
 - [注意事项](./cautions) — 常见问题与重要提醒
+- [MAC 地址设置](./mac-address) — Vendor HCI Command 自定义 MAC 地址
 
 ---
 

@@ -28,7 +28,8 @@ export default defineConfig({
             { text: 'A2DP 音频问题', link: '/faq/audio' },
             { text: 'Feature 支持情况', link: '/faq/feature' },
             { text: 'INI 配置', link: '/faq/ini-config' },
-            { text: '注意事项', link: '/faq/cautions' }
+            { text: '注意事项', link: '/faq/cautions' },
+            { text: 'MAC 地址设置', link: '/faq/mac-address' }
           ]
         }
       ],
