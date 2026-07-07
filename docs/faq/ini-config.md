@@ -87,6 +87,7 @@ coex_wifi_pwr_adj_value=18
 ```
 
 > **注意**：`coex_wifi_pwr_adj_en=0` 时，`coex_wifi_pwr_adj_value` 不生效，WiFi 使用默认发射功率。
+> <small>bt 的流量也会影响此功能。</small>
 
 ---
 
