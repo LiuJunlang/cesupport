@@ -69,17 +69,24 @@ ps_mode=0
 
 ---
 
-## Q3：<待填充>
+## Q3：WiFi 发射功率如何通过 INI 调节？
 
-<!--
+通过以下两个配置项可以启用并设置 WiFi 的发射功率：
 
-**排查方向**：
+| 配置项 | 说明 |
+|--------|------|
+| `coex_wifi_pwr_adj_en` | WiFi 发射功率调节开关。`1` = 开启，`0` = 关闭 |
+| `coex_wifi_pwr_adj_value` | WiFi 发射功率目标值，单位为 dBm |
 
-1. 
-2. 
-3. 
+### 配置示例
 
--->
+```ini
+# 开启 WiFi 发射功率调节，设置为 18 dBm
+coex_wifi_pwr_adj_en=1
+coex_wifi_pwr_adj_value=18
+```
+
+> **注意**：`coex_wifi_pwr_adj_en=0` 时，`coex_wifi_pwr_adj_value` 不生效，WiFi 使用默认发射功率。
 
 ---
 
@@ -89,6 +96,8 @@ ps_mode=0
 |--------|----------|------|--------|
 | `rcu_pattern` | — | 配置唤醒 | bit 0: AB 格式 / bit 1: 广电格式 |
 | `ps_mode` | — | 低功耗模式 (bitmask) | bit 0: WiFi IP Sleep / bit 1: WSYS Deep Sleep / bit 2: BSYS Deep Sleep / bit 3: DTOP Deep Sleep |
+| `coex_wifi_pwr_adj_en` | — | WiFi 发射功率调节开关 | `0` = 关闭 / `1` = 开启 |
+| `coex_wifi_pwr_adj_value` | — | WiFi 发射功率目标值 | 单位 dBm，如 `18` |
 
 ---
 
