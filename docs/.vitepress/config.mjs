@@ -13,6 +13,7 @@ export default defineConfig({
 
     nav: [
       { text: '首页', link: '/' },
+      { text: '客户信息', link: '/客户信息.html' },
       { text: 'FAQ', link: '/faq/' },
       { text: '调试指南', link: '/guides/' },
       { text: '固件发布', link: '/firmware/' }
