@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="pwd-hash" content="">
+<title>客户信息管理</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: #f0f2f5;
+  color: #333;
+  min-height: 100vh;
+}
+
+#login-page {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.login-box {
+  background: #fff; border-radius: 12px; padding: 48px 40px;
+  width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,.15);
+}
+.login-box h1 { text-align: center; font-size: 24px; margin-bottom: 8px; color: #1a1a2e; }
+.login-box .subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 32px; }
+.login-box label { display: block; font-size: 14px; color: #555; margin-bottom: 6px; font-weight: 500; }
+.login-box input[type="password"] {
+  width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0;
+  border-radius: 8px; font-size: 16px; outline: none; transition: border .2s;
+}
+.login-box input[type="password"]:focus { border-color: #667eea; }
+.login-box .btn {
+  width: 100%; padding: 12px; border: none; border-radius: 8px;
+  font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 24px;
+  transition: all .2s;
+}
+.btn-primary { background: #667eea; color: #fff; }
+.btn-primary:hover { background: #5a6fd6; }
+.login-box .error { color: #e74c3c; font-size: 13px; margin-top: 12px; text-align: center; min-height: 20px; }
+.login-box .hint { color: #888; font-size: 13px; margin-top: 12px; text-align: center; }
+
+#main-page { display: none; max-width: 1200px; margin: 0 auto; padding: 24px; }
+.header {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  padding: 20px 0; border-bottom: 1px solid #e8e8e8; margin-bottom: 24px;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.header h1 { font-size: 22px; color: #1a1a2e; }
+.header .count { font-size: 13px; color: #888; background: #f0f0f0; padding: 4px 12px; border-radius: 20px; }
+.header-right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn { padding: 10px 20px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all .2s; }
+.btn-add { background: #667eea; color: #fff; }
+.btn-add:hover { background: #5a6fd6; }
+.btn-logout { background: #fff; color: #666; border: 1px solid #ddd; }
+.btn-logout:hover { background: #f5f5f5; }
+.btn-change-pwd { background: #fff; color: #666; border: 1px solid #ddd; }
+.btn-change-pwd:hover { background: #f5f5f5; }
+.btn-download {
+  background: #27ae60; color: #fff;
+  animation: pulse-download 2s infinite;
+}
+.btn-download:hover { background: #219a52; }
+@keyframes pulse-download {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(39,174,96,.4); }
+  50% { box-shadow: 0 0 0 8px rgba(39,174,96,0); }
+}
+
+.toolbar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.toolbar input[type="text"] {
+  flex: 1; min-width: 200px; padding: 10px 14px;
+  border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none;
+}
+.toolbar input[type="text"]:focus { border-color: #667eea; }
+.toolbar select {
+  padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+  font-size: 14px; outline: none; background: #fff; cursor: pointer;
+}
+
+/* 客户卡片 */
+.customer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 16px; }
+.customer-card {
+  background: #fff; border-radius: 10px; padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06); cursor: pointer;
+  transition: all .2s; border: 1px solid #eee; position: relative;
+}
+.customer-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.card-company { font-size: 17px; font-weight: 600; color: #1a1a2e; }
+.card-status {
+  font-size: 12px; padding: 3px 10px; border-radius: 12px; font-weight: 500; white-space: nowrap;
+}
+.status-following { background: #e3f2fd; color: #1565c0; }
+.status-signed { background: #e8f5e9; color: #2e7d32; }
+.status-done { background: #f3e5f5; color: #7b1fa2; }
+.status-paused { background: #fff3e0; color: #e65100; }
+.card-contact { font-size: 13px; color: #666; margin-bottom: 6px; }
+.card-project { font-size: 13px; color: #888; margin-bottom: 8px; }
+.card-meta { display: flex; gap: 16px; font-size: 12px; color: #aaa; flex-wrap: wrap; }
+.card-actions {
+  position: absolute; top: 16px; right: 16px; display: flex; gap: 4px;
+  opacity: 0; transition: opacity .2s;
+}
+.customer-card:hover .card-actions { opacity: 1; }
+.card-actions button {
+  width: 30px; height: 30px; border-radius: 6px; border: 1px solid #ddd;
+  background: #fff; cursor: pointer; font-size: 13px; display: flex;
+  align-items: center; justify-content: center; transition: all .15s;
+}
+.card-actions .btn-edit:hover { background: #e3f2fd; border-color: #667eea; color: #667eea; }
+.card-actions .btn-del:hover { background: #ffebee; border-color: #e74c3c; color: #e74c3c; }
+
+/* 弹窗 */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.4); z-index: 1000;
+  align-items: flex-start; justify-content: center; padding-top: 40px; overflow-y: auto;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: #fff; border-radius: 12px; width: 680px; max-width: 95vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2); padding: 32px; margin-bottom: 40px;
+}
+.modal h2 { font-size: 20px; color: #1a1a2e; margin-bottom: 24px; }
+.form-group { margin-bottom: 18px; }
+.form-group label {
+  display: block; font-size: 13px; font-weight: 500; color: #555; margin-bottom: 6px;
+}
+.form-group label .required { color: #e74c3c; }
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%; padding: 10px 14px; border: 1px solid #ddd;
+  border-radius: 8px; font-size: 14px; outline: none; font-family: inherit;
+  transition: border .2s;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #667eea; }
+.form-group textarea { resize: vertical; min-height: 80px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 28px; }
+.btn-save { background: #667eea; color: #fff; }
+.btn-save:hover { background: #5a6fd6; }
+.btn-cancel { background: #fff; color: #666; border: 1px solid #ddd; }
+.btn-cancel:hover { background: #f5f5f5; }
+.btn-danger { background: #fff; color: #e74c3c; border: 1px solid #e74c3c; }
+.btn-danger:hover { background: #ffebee; }
+
+.timeline-section { margin-top: 8px; }
+.timeline-section h3 { font-size: 15px; color: #333; margin-bottom: 12px; }
+.timeline-item { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.timeline-item input { flex: 1; }
+.timeline-item input[type="date"] { width: 140px; flex: none; }
+.btn-remove-item {
+  width: 32px; height: 32px; border-radius: 6px; border: 1px solid #ddd;
+  background: #fff; cursor: pointer; font-size: 16px; color: #e74c3c;
+  display: flex; align-items: center; justify-content: center; flex: none;
+}
+.btn-remove-item:hover { background: #ffebee; }
+.btn-add-item {
+  font-size: 13px; color: #667eea; background: none; border: none;
+  cursor: pointer; padding: 4px 0; margin-top: 4px;
+}
+.btn-add-item:hover { text-decoration: underline; }
+
+.link-section { margin-top: 8px; }
+.link-section h3 { font-size: 15px; color: #333; margin-bottom: 12px; }
+.link-item { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.link-item input { flex: 1; }
+
+.confirm-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.4); z-index: 2000;
+  align-items: center; justify-content: center;
+}
+.confirm-overlay.active { display: flex; }
+.confirm-box {
+  background: #fff; border-radius: 12px; padding: 32px; width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2); text-align: center;
+}
+.confirm-box p { font-size: 15px; color: #333; margin-bottom: 24px; }
+.confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+.pwd-modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,.4); z-index: 1500;
+  align-items: center; justify-content: center;
+}
+.pwd-modal-overlay.active { display: flex; }
+.pwd-modal {
+  background: #fff; border-radius: 12px; padding: 32px; width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.2);
+}
+.pwd-modal h2 { font-size: 18px; margin-bottom: 20px; }
+.pwd-error { color: #e74c3c; font-size: 13px; margin-top: 8px; min-height: 20px; }
+
+.empty-state { text-align: center; padding: 80px 20px; color: #aaa; }
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: #333; color: #fff; padding: 12px 28px; border-radius: 30px;
+  font-size: 14px; z-index: 9999; opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- 登录页 -->
+<div id="login-page">
+  <div class="login-box">
+    <h1>客户信息管理</h1>
+    <p class="subtitle" id="login-subtitle">请输入密码以继续</p>
+    <label for="pwd-input">密码</label>
+    <input type="password" id="pwd-input" placeholder="请输入访问密码" onkeydown="if(event.key==='Enter')handleLogin()">
+    <button class="btn btn-primary" onclick="handleLogin()" id="login-btn">验证</button>
+    <p class="error" id="login-error"></p>
+    <p class="hint" id="login-hint"></p>
+  </div>
+</div>
+
+<!-- 主页面 -->
+<div id="main-page">
+  <div class="header">
+    <div class="header-left">
+      <h1>客户信息</h1>
+      <span class="count" id="customer-count">0 条记录</span>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-download" onclick="downloadUpdatedHTML()" id="btn-download" title="保存数据到文件，然后 git push 更新远端">⬇ 下载更新文件</button>
+      <button class="btn btn-change-pwd" onclick="showChangePwd()">修改密码</button>
+      <button class="btn btn-logout" onclick="handleLogout()">退出</button>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="search-input" placeholder="搜索公司名称 / 联系人 / 项目名..." oninput="renderCustomerList()">
+    <select id="status-filter" onchange="renderCustomerList()">
+      <option value="">全部状态</option>
+      <option value="跟进中">跟进中</option>
+      <option value="已签约">已签约</option>
+      <option value="已完成">已完成</option>
+      <option value="已暂停">已暂停</option>
+    </select>
+    <button class="btn btn-add" onclick="openCustomerModal()">+ 新增客户</button>
+  </div>
+
+  <div class="customer-grid" id="customer-grid"></div>
+  <div class="empty-state" id="empty-state" style="display:none">
+    <div class="icon">📋</div>
+    <p>暂无客户记录，点击上方按钮新增</p>
+  </div>
+</div>
+
+<!-- 客户编辑弹窗 -->
+<div class="modal-overlay" id="customer-modal">
+  <div class="modal">
+    <h2 id="modal-title">新增客户</h2>
+    <form id="customer-form" onsubmit="return false">
+      <div class="form-row">
+        <div class="form-group">
+          <label><span class="required">*</span> 公司名称</label>
+          <input type="text" id="f-company" required placeholder="客户公司全称">
+        </div>
+        <div class="form-group">
+          <label>合作状态</label>
+          <select id="f-status">
+            <option value="跟进中">跟进中</option>
+            <option value="已签约">已签约</option>
+            <option value="已完成">已完成</option>
+            <option value="已暂停">已暂停</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>联系人</label>
+          <input type="text" id="f-contact" placeholder="联系人姓名">
+        </div>
+        <div class="form-group">
+          <label>职位</label>
+          <input type="text" id="f-position" placeholder="联系人职位">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>电话</label>
+          <input type="text" id="f-phone" placeholder="联系电话">
+        </div>
+        <div class="form-group">
+          <label>邮箱</label>
+          <input type="email" id="f-email" placeholder="联系邮箱">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>微信</label>
+        <input type="text" id="f-wechat" placeholder="微信号">
+      </div>
+      <div class="form-group">
+        <label>项目名称</label>
+        <input type="text" id="f-project" placeholder="关联项目名称">
+      </div>
+      <div class="form-group">
+        <label>需求描述</label>
+        <textarea id="f-requirements" placeholder="客户需求、技术规格、方案要点等"></textarea>
+      </div>
+      <div class="form-group">
+        <label>备注</label>
+        <textarea id="f-notes" placeholder="自由备注信息"></textarea>
+      </div>
+      <div class="timeline-section">
+        <h3>关键时间线</h3>
+        <div id="timeline-container"></div>
+        <button type="button" class="btn-add-item" onclick="addTimelineItem()">+ 添加时间节点</button>
+      </div>
+      <div class="link-section">
+        <h3>相关禅道</h3>
+        <div id="zentao-container"></div>
+        <button type="button" class="btn-add-item" onclick="addZentaoLink()">+ 添加禅道链接</button>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-cancel" onclick="closeCustomerModal()">取消</button>
+        <button type="submit" class="btn btn-save" onclick="saveCustomer()">保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 确认删除 -->
+<div class="confirm-overlay" id="confirm-modal">
+  <div class="confirm-box">
+    <p id="confirm-msg">确定要删除这条客户记录吗？</p>
+    <div class="confirm-actions">
+      <button class="btn btn-cancel" onclick="closeConfirm()">取消</button>
+      <button class="btn btn-danger" id="confirm-ok" onclick="handleConfirm()">确认删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- 修改密码 -->
+<div class="pwd-modal-overlay" id="pwd-modal">
+  <div class="pwd-modal">
+    <h2>修改密码</h2>
+    <div class="form-group">
+      <label>当前密码</label>
+      <input type="password" id="pwd-old" placeholder="请输入当前密码">
+    </div>
+    <div class="form-group">
+      <label>新密码</label>
+      <input type="password" id="pwd-new" placeholder="请输入新密码（至少4位）">
+    </div>
+    <div class="form-group">
+      <label>确认新密码</label>
+      <input type="password" id="pwd-new2" placeholder="请再次输入新密码">
+    </div>
+    <p class="pwd-error" id="pwd-error"></p>
+    <div class="form-actions">
+      <button class="btn btn-cancel" onclick="closeChangePwd()">取消</button>
+      <button class="btn btn-save" onclick="handleChangePwd()">确认修改</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== 从 HTML 嵌入数据中加载 ======
+let customers = [];
+let editId = null;
+let pendingDeleteId = null;
+let dirty = false; // 是否有未下载的修改
+
+function loadData() {
+  try {
+    const el = document.getElementById('customer-data');
+    if (el && el.textContent.trim()) {
+      customers = JSON.parse(el.textContent);
+    } else {
+      customers = [];
+    }
+  } catch(e) {
+    console.error('数据解析失败', e);
+    customers = [];
+  }
+}
+
+function getPwdHash() {
+  const meta = document.querySelector('meta[name="pwd-hash"]');
+  return meta ? meta.getAttribute('content') || '' : '';
+}
+
+function setPwdHash(hash) {
+  const meta = document.querySelector('meta[name="pwd-hash"]');
+  if (meta) meta.setAttribute('content', hash);
+}
+
+async function hashPassword(pwd) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pwd);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ====== 登录 ======
+async function handleLogin() {
+  const input = document.getElementById('pwd-input').value.trim();
+  const errorEl = document.getElementById('login-error');
+  const pwdHash = getPwdHash();
+
+  if (!input) { errorEl.textContent = '请输入密码'; return; }
+
+  if (!pwdHash) {
+    if (input.length < 4) { errorEl.textContent = '密码至少4位'; return; }
+    const hash = await hashPassword(input);
+    setPwdHash(hash);
+    document.getElementById('pwd-input').value = '';
+    showMainPage();
+    showToast('密码已设置。请点击「下载更新文件」保存到本地，然后 git push。');
+    dirty = true;
+    updateDownloadBtn();
+  } else {
+    const hash = await hashPassword(input);
+    if (hash === pwdHash) {
+      document.getElementById('pwd-input').value = '';
+      showMainPage();
+    } else {
+      errorEl.textContent = '密码错误，请重试';
+    }
+  }
+}
+
+function updateLoginUI() {
+  const pwdHash = getPwdHash();
+  if (!pwdHash) {
+    document.getElementById('login-subtitle').textContent = '首次使用，请设置访问密码';
+    document.getElementById('login-btn').textContent = '设置密码';
+    document.getElementById('login-hint').textContent = '密码将嵌入页面文件中，与数据一起推送到 GitHub';
+  } else {
+    document.getElementById('login-subtitle').textContent = '请输入密码以继续';
+    document.getElementById('login-btn').textContent = '验证';
+    document.getElementById('login-hint').textContent = '';
+  }
+}
+
+function showMainPage() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('main-page').style.display = 'block';
+  loadData();
+  renderCustomerList();
+  dirty = false;
+  updateDownloadBtn();
+}
+
+function handleLogout() {
+  document.getElementById('main-page').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+  updateLoginUI();
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('pwd-input').value = '';
+}
+
+// ====== 修改密码 ======
+function showChangePwd() {
+  document.getElementById('pwd-modal').classList.add('active');
+  document.getElementById('pwd-old').value = '';
+  document.getElementById('pwd-new').value = '';
+  document.getElementById('pwd-new2').value = '';
+  document.getElementById('pwd-error').textContent = '';
+}
+function closeChangePwd() {
+  document.getElementById('pwd-modal').classList.remove('active');
+}
+async function handleChangePwd() {
+  const oldPwd = document.getElementById('pwd-old').value.trim();
+  const newPwd = document.getElementById('pwd-new').value.trim();
+  const newPwd2 = document.getElementById('pwd-new2').value.trim();
+  const errorEl = document.getElementById('pwd-error');
+  if (!oldPwd || !newPwd || !newPwd2) { errorEl.textContent = '请填写所有字段'; return; }
+  if (newPwd.length < 4) { errorEl.textContent = '新密码至少4位'; return; }
+  if (newPwd !== newPwd2) { errorEl.textContent = '两次输入的新密码不一致'; return; }
+  const oldHash = await hashPassword(oldPwd);
+  if (oldHash !== getPwdHash()) { errorEl.textContent = '当前密码错误'; return; }
+  const newHash = await hashPassword(newPwd);
+  setPwdHash(newHash);
+  closeChangePwd();
+  dirty = true;
+  updateDownloadBtn();
+  showToast('密码已修改。请点击「下载更新文件」保存到本地，然后 git push。');
+}
+
+// ====== 下载更新后的 HTML ======
+function downloadUpdatedHTML() {
+  // 先把当前数据写回嵌入标签
+  document.getElementById('customer-data').textContent = JSON.stringify(customers, null, 2);
+
+  const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '客户信息.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  dirty = false;
+  updateDownloadBtn();
+  showToast('文件已下载。请替换本地文件后 git commit && git push。');
+}
+
+function updateDownloadBtn() {
+  const btn = document.getElementById('btn-download');
+  if (dirty) {
+    btn.style.animation = 'pulse-download 2s infinite';
+    btn.textContent = '⬇ 下载更新文件（有未保存修改）';
+  } else {
+    btn.style.animation = 'none';
+    btn.textContent = '⬇ 下载更新文件';
+  }
+}
+
+function markDirty() {
+  dirty = true;
+  updateDownloadBtn();
+}
+
+// ====== Toast ======
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ====== 客户列表渲染 ======
+function getStatusClass(status) {
+  const map = { '跟进中': 'status-following', '已签约': 'status-signed', '已完成': 'status-done', '已暂停': 'status-paused' };
+  return map[status] || '';
+}
+function renderCustomerList() {
+  const search = (document.getElementById('search-input').value || '').toLowerCase();
+  const statusFilter = document.getElementById('status-filter').value;
+  const grid = document.getElementById('customer-grid');
+  const empty = document.getElementById('empty-state');
+  let filtered = customers;
+  if (search) {
+    filtered = filtered.filter(c =>
+      (c.companyName||'').toLowerCase().includes(search) ||
+      (c.contactName||'').toLowerCase().includes(search) ||
+      (c.projectName||'').toLowerCase().includes(search)
+    );
+  }
+  if (statusFilter) filtered = filtered.filter(c => c.status === statusFilter);
+  document.getElementById('customer-count').textContent = customers.length + ' 条记录';
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = filtered.map(c => `
+    <div class="customer-card" onclick="openCustomerModal('${c.id}')">
+      <div class="card-actions" onclick="event.stopPropagation()">
+        <button class="btn-edit" title="编辑" onclick="openCustomerModal('${c.id}')">✎</button>
+        <button class="btn-del" title="删除" onclick="confirmDelete('${c.id}')">✕</button>
+      </div>
+      <div class="card-header">
+        <span class="card-company">${esc(c.companyName || '未命名')}</span>
+        <span class="card-status ${getStatusClass(c.status)}">${esc(c.status || '跟进中')}</span>
+      </div>
+      ${c.contactName ? '<div class="card-contact">' + esc(c.contactName) + (c.contactPosition ? ' · ' + esc(c.contactPosition) : '') + '</div>' : ''}
+      ${c.projectName ? '<div class="card-project">📌 ' + esc(c.projectName) + '</div>' : ''}
+      <div class="card-meta">
+        <span>🕐 ${formatDate(c.updatedAt || c.createdAt)}</span>
+        ${c.zentaoLinks && c.zentaoLinks.length > 0 ? '<span>🔗 禅道 ×' + c.zentaoLinks.length + '</span>' : ''}
+        ${c.timeline && c.timeline.length > 0 ? '<span>📅 时间线 ×' + c.timeline.length + '</span>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+function esc(s) {
+  if (!s) return '';
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+function formatDate(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+// ====== 编辑弹窗 ======
+function openCustomerModal(id) {
+  editId = id || null;
+  document.getElementById('modal-title').textContent = id ? '编辑客户' : '新增客户';
+  document.getElementById('customer-modal').classList.add('active');
+  if (id) { const c = customers.find(c => c.id === id); if (c) fillForm(c); }
+  else clearForm();
+}
+function closeCustomerModal() {
+  document.getElementById('customer-modal').classList.remove('active');
+  editId = null;
+}
+function clearForm() {
+  document.getElementById('f-company').value = '';
+  document.getElementById('f-status').value = '跟进中';
+  document.getElementById('f-contact').value = '';
+  document.getElementById('f-position').value = '';
+  document.getElementById('f-phone').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-wechat').value = '';
+  document.getElementById('f-project').value = '';
+  document.getElementById('f-requirements').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('timeline-container').innerHTML = '';
+  document.getElementById('zentao-container').innerHTML = '';
+}
+function fillForm(c) {
+  document.getElementById('f-company').value = c.companyName || '';
+  document.getElementById('f-status').value = c.status || '跟进中';
+  document.getElementById('f-contact').value = c.contactName || '';
+  document.getElementById('f-position').value = c.contactPosition || '';
+  document.getElementById('f-phone').value = c.phone || '';
+  document.getElementById('f-email').value = c.email || '';
+  document.getElementById('f-wechat').value = c.wechat || '';
+  document.getElementById('f-project').value = c.projectName || '';
+  document.getElementById('f-requirements').value = c.requirements || '';
+  document.getElementById('f-notes').value = c.notes || '';
+  const tc = document.getElementById('timeline-container'); tc.innerHTML = '';
+  (c.timeline || []).forEach(t => addTimelineItem(t.date, t.event));
+  const zc = document.getElementById('zentao-container'); zc.innerHTML = '';
+  (c.zentaoLinks || []).forEach(link => addZentaoLink(link));
+}
+function addTimelineItem(dateVal, eventVal) {
+  const container = document.getElementById('timeline-container');
+  const div = document.createElement('div');
+  div.className = 'timeline-item';
+  div.innerHTML = '<input type="date" class="tl-date" value="' + esc(dateVal || '') + '"><input type="text" class="tl-event" placeholder="事件描述" value="' + esc(eventVal || '') + '"><button type="button" class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>';
+  container.appendChild(div);
+}
+function addZentaoLink(linkVal) {
+  const container = document.getElementById('zentao-container');
+  const div = document.createElement('div');
+  div.className = 'link-item';
+  div.innerHTML = '<input type="text" class="zl-link" placeholder="禅道链接 URL" value="' + esc(linkVal || '') + '"><button type="button" class="btn-remove-item" onclick="this.parentElement.remove()">✕</button>';
+  container.appendChild(div);
+}
+function collectTimeline() {
+  const items = document.querySelectorAll('#timeline-container .timeline-item');
+  return Array.from(items).map(item => ({
+    date: item.querySelector('.tl-date').value,
+    event: item.querySelector('.tl-event').value
+  })).filter(t => t.date || t.event);
+}
+function collectZentaoLinks() {
+  const items = document.querySelectorAll('#zentao-container .link-item');
+  return Array.from(items).map(item => item.querySelector('.zl-link').value).filter(v => v.trim());
+}
+function saveCustomer() {
+  const company = document.getElementById('f-company').value.trim();
+  if (!company) { alert('请填写公司名称'); return; }
+  const now = new Date().toISOString();
+  const data = {
+    id: editId || Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    companyName: company,
+    status: document.getElementById('f-status').value,
+    contactName: document.getElementById('f-contact').value.trim(),
+    contactPosition: document.getElementById('f-position').value.trim(),
+    phone: document.getElementById('f-phone').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    wechat: document.getElementById('f-wechat').value.trim(),
+    projectName: document.getElementById('f-project').value.trim(),
+    requirements: document.getElementById('f-requirements').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    timeline: collectTimeline(),
+    zentaoLinks: collectZentaoLinks(),
+    createdAt: editId ? (customers.find(c => c.id === editId)?.createdAt || now) : now,
+    updatedAt: now
+  };
+  if (editId) {
+    const idx = customers.findIndex(c => c.id === editId);
+    if (idx >= 0) customers[idx] = data;
+  } else {
+    customers.push(data);
+  }
+  closeCustomerModal();
+  renderCustomerList();
+  markDirty();
+  showToast('已保存到内存。请点击「下载更新文件」保存到本地。');
+}
+
+// ====== 删除 ======
+function confirmDelete(id) {
+  pendingDeleteId = id;
+  const c = customers.find(c => c.id === id);
+  document.getElementById('confirm-msg').textContent = '确定要删除「' + (c ? c.companyName : '未知') + '」吗？此操作不可恢复。';
+  document.getElementById('confirm-modal').classList.add('active');
+}
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.remove('active');
+  pendingDeleteId = null;
+}
+function handleConfirm() {
+  if (pendingDeleteId) {
+    customers = customers.filter(c => c.id !== pendingDeleteId);
+    renderCustomerList();
+    markDirty();
+    showToast('已删除。请点击「下载更新文件」保存到本地。');
+  }
+  closeConfirm();
+}
+
+// ====== 初始化 ======
+loadData();
+updateLoginUI();
+
+// ESC & 遮罩关闭
+document.getElementById('customer-modal').addEventListener('click', function(e) { if (e.target === this) closeCustomerModal(); });
+document.getElementById('confirm-modal').addEventListener('click', function(e) { if (e.target === this) closeConfirm(); });
+document.getElementById('pwd-modal').addEventListener('click', function(e) { if (e.target === this) closeChangePwd(); });
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('customer-modal').classList.contains('active')) closeCustomerModal();
+    else if (document.getElementById('confirm-modal').classList.contains('active')) closeConfirm();
+    else if (document.getElementById('pwd-modal').classList.contains('active')) closeChangePwd();
+  }
+});
+</script>
+
+<!-- ====== 嵌入数据（编辑后由此处序列化到下载文件） ====== -->
+<script type="application/json" id="customer-data">
+[]
+</script>
+</body>
+</html>
